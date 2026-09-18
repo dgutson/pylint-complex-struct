@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pylint-complex-struct"
+version = "0.1.0"
+description = "A pylint checker that flags over-nested type annotations and pushes them towards type aliases, NamedTuples and TypedDicts"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = ["pylint>=4.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools]
+packages = ["pylint_complex_struct"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.pylint.main]
+load-plugins = ["pylint_complex_struct"]
+# The functional fixture is deliberately full of violations.
+ignore-paths = ["tests/functional/.*"]
+
+[tool.pylint.basic]
+# A test name is its documentation.
+no-docstring-rgx = "^(_|test_)"
