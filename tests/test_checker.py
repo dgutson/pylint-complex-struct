@@ -13,9 +13,9 @@ from pylint.testutils import CheckerTestCase, MessageTest
 
 from pylint_complex_struct.checker import ComplexStructChecker
 
-ARC = "tuple[dict[str, tuple[int, int] | None], dict[int, str]]"
-ARCHIVE = "tuple[list[dict[str, Any]], dict[str, Any]]"
-MANIFEST = "tuple[dict[str, Any], list[dict[str, str]]]"
+PHASES = "tuple[dict[str, tuple[int, int] | None], dict[int, str]]"
+RECORDS = "tuple[list[dict[str, Any]], dict[str, Any]]"
+INDEX = "tuple[dict[str, Any], list[dict[str, str]]]"
 DEEP = "dict[str, list[tuple[int, int]]]"
 
 needs_pep695 = pytest.mark.skipif(
@@ -73,7 +73,7 @@ class TestComplexStructChecker(CheckerTestCase):  # pylint: disable=too-many-pub
         with self.assertNoMessages():
             self.walk(node)
 
-    @pytest.mark.parametrize("annotation", [ARC, ARCHIVE, MANIFEST])
+    @pytest.mark.parametrize("annotation", [PHASES, RECORDS, INDEX])
     def test_real_return_annotations_are_flagged_once(self, annotation: str) -> None:
         node = module(f"def load() -> {annotation}:\n    ...")
         function = node.body[0]
@@ -148,7 +148,7 @@ class TestComplexStructChecker(CheckerTestCase):  # pylint: disable=too-many-pub
             self.walk(module("def f() -> None:\n    ...\n\ndef g():\n    ..."))
 
     def test_stub_files_are_skipped(self) -> None:
-        node = module(f"def f() -> {ARC}: ...")
+        node = module(f"def f() -> {PHASES}: ...")
         node.file = "shapes.pyi"
         with self.assertNoMessages():
             self.walk(node)
@@ -270,7 +270,7 @@ class TestComplexStructChecker(CheckerTestCase):  # pylint: disable=too-many-pub
     # -- one message per site -------------------------------------------------
 
     def test_deep_tuple_return_reports_only_the_depth(self) -> None:
-        node = module(f"def load() -> {MANIFEST}:\n    ...")
+        node = module(f"def load() -> {INDEX}:\n    ...")
         assert [m.msg_id for m in self._collect(node)] == ["complex-type-annotation"]
 
     def test_items_shape_is_a_depth_violation_not_a_namedtuple_suggestion(self) -> None:
@@ -343,7 +343,7 @@ class TestComplexStructChecker(CheckerTestCase):  # pylint: disable=too-many-pub
 
     def test_budget_of_three_matches_the_flake8_default(self) -> None:
         self.linter.config.max_annotation_complexity = 3
-        node = module(f"def load() -> {ARC}:\n    ...")
+        node = module(f"def load() -> {PHASES}:\n    ...")
         assert [m.msg_id for m in self._collect(node)] == ["complex-type-annotation"]
         with self.assertNoMessages():
             self.walk(module("def load() -> list[dict[str, Any]]:\n    ..."))

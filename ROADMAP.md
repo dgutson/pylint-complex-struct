@@ -225,7 +225,7 @@ Candidates, roughly in order of usefulness:
 - **CI matrix on 3.10–3.13.** The PEP 695 tests already skip below 3.12; nothing
   else is version-sensitive, but it is untested off 3.12 today.
 - **A `--suggest` mode** printing a concrete alias for each finding
-  (`type ArcResult = tuple[RowMap, IndexMap]`). Pylint cannot apply fixes, so
+  (`type LoadResult = tuple[RowMap, IndexMap]`). Pylint cannot apply fixes, so
   this would be message text only.
 
 Not planned: expanding aliases during scoring. That would make the rule

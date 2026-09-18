@@ -15,10 +15,10 @@ from pylint_complex_struct.depth import (
 )
 from pylint_complex_struct.names import ImportMap
 
-#: The three annotations that prompted this checker, verbatim.
-ARC = "tuple[dict[str, tuple[int, int] | None], dict[int, str]]"
-ARCHIVE = "tuple[list[dict[str, Any]], dict[str, Any]]"
-MANIFEST = "tuple[dict[str, Any], list[dict[str, str]]]"
+#: The three annotations that prompted this checker.
+PHASES = "tuple[dict[str, tuple[int, int] | None], dict[int, str]]"
+RECORDS = "tuple[list[dict[str, Any]], dict[str, Any]]"
+INDEX = "tuple[dict[str, Any], list[dict[str, str]]]"
 
 
 def score(source: str, policy: Policy | None = None, imports: ImportMap | None = None) -> int:
@@ -60,9 +60,9 @@ def score_node(node: nodes.NodeNG) -> int:
         ("type[Foo]", 2),
         ("Awaitable[tuple[str, int]]", 3),
         # the real offenders
-        (ARC, 4),
-        (ARCHIVE, 4),
-        (MANIFEST, 4),
+        (PHASES, 4),
+        (RECORDS, 4),
+        (INDEX, 4),
         # unions
         ("int | None", 1),
         ("int | str", 2),
@@ -89,7 +89,7 @@ def test_depth(source: str, expected: int) -> None:
     assert score(source) == expected
 
 
-@pytest.mark.parametrize("source", [ARC, ARCHIVE, MANIFEST])
+@pytest.mark.parametrize("source", [PHASES, RECORDS, INDEX])
 def test_real_examples_are_over_the_default_budget(source: str) -> None:
     assert score(source) > Policy().max_annotation_complexity
 
