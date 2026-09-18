@@ -212,6 +212,16 @@ Candidates, roughly in order of usefulness:
   expressions that are currently not checked at all.
 - **Publish to PyPI**, so `additional_dependencies` and CI installs stop needing a
   path.
+- **Installing and developing with `uv`.** `uv sync` and `uv run pytest` in
+  place of the `python3 -m venv` / `pip install -e '.[dev]'` dance the README
+  still prescribes,
+  `uv run pylint --load-plugins=pylint_complex_struct yourpackage` for
+  consumers, and a committed `uv.lock` so a checkout is reproducible. Mostly
+  documentation, plus moving the `dev` extra into a `[dependency-groups]` table
+  so `uv sync` picks it up without an `--extra`. Two routes do not follow:
+  `pre-commit` resolves `additional_dependencies` through pip, and
+  `uv add pylint-complex-struct` wants an index, so this reads better once
+  **Publish to PyPI** is done.
 - **CI matrix on 3.10–3.13.** The PEP 695 tests already skip below 3.12; nothing
   else is version-sensitive, but it is untested off 3.12 today.
 - **A `--suggest` mode** printing a concrete alias for each finding
