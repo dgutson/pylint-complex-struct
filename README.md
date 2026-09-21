@@ -44,7 +44,7 @@ deprecated typing constructs — and ruff has no equivalent rule.
 Requires Python 3.10+ and pylint 4.0+.
 
 ```bash
-pip install git+https://github.com/dgutson/pylint-complex-struct.git
+pip install pylint-complex-struct
 ```
 
 Or from a checkout:
@@ -95,19 +95,22 @@ repos:
       - id: pylint-complex-struct
         name: complex type annotations
         entry: pylint --load-plugins=pylint_complex_struct
-        language: system
+        language: python
+        additional_dependencies: [pylint, pylint-complex-struct]
         types: [python]
 ```
 
-A `local`/`system` hook is simplest, because the plugin has to be importable in the same
-environment as pylint.
+The plugin has to be importable in the same environment as pylint, so both are named in
+`additional_dependencies` and pre-commit builds one venv holding the pair. Swap
+`language: python` for `language: system` and drop `additional_dependencies` to reuse the
+environment you already have.
 </details>
 
 <details>
 <summary>CI</summary>
 
 ```yaml
-- run: pip install pylint git+https://github.com/dgutson/pylint-complex-struct.git
+- run: pip install pylint-complex-struct
 - run: pylint --load-plugins=pylint_complex_struct --disable=all
          --enable=complex-type-annotation,complex-type-alias,tuple-should-be-namedtuple
          yourpackage

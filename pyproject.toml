@@ -38,6 +38,9 @@ dev = ["pytest>=8"]
 [tool.setuptools]
 packages = ["pylint_complex_struct"]
 
+[tool.setuptools.package-data]
+pylint_complex_struct = ["py.typed"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
