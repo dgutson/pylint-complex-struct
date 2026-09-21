@@ -1,5 +1,6 @@
 # pylint-complex-struct
 
+[![PyPI](https://img.shields.io/pypi/v/pylint-complex-struct.svg)](https://pypi.org/project/pylint-complex-struct/)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![pylint](https://img.shields.io/badge/pylint-4.0%2B-green.svg)](https://pylint.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)

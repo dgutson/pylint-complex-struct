@@ -23,7 +23,8 @@ rationale for each construct, and the comparison with flake8 and ruff.
 ## Installing
 
 ```bash
-pip install -e /path/to/pylint-complex-struct     # from a checkout
+pip install pylint-complex-struct
+pip install -e /path/to/pylint-complex-struct     # or from a checkout
 ```
 
 It needs Python 3.10+ and pylint 4.0+. Nothing is registered automatically:
@@ -196,7 +197,9 @@ the `pyproject.toml` stanza above is usually all that is needed.
 ## Where it is going
 
 Done and stable: the metric, the three messages, all nine options, 126 tests, and
-a self-clean run against its own source.
+a self-clean run against its own source. Released to PyPI as `pylint-complex-struct`
+0.1.0, published from `.github/workflows/publish.yml` over Trusted Publishing — a
+`v*` tag releases, a manual dispatch of the same workflow rehearses on TestPyPI.
 
 Candidates, roughly in order of usefulness:
 
@@ -210,8 +213,6 @@ Candidates, roughly in order of usefulness:
   is why it is not in v0.1.
 - **`NewType`, `TypeVar(bound=...)`, `cast("...")`** — annotation-shaped
   expressions that are currently not checked at all.
-- **Publish to PyPI**, so `additional_dependencies` and CI installs stop needing a
-  path.
 - **Installing and developing with `uv`.** `uv sync` and `uv run pytest` in
   place of the `python3 -m venv` / `pip install -e '.[dev]'` dance the README
   still prescribes,
@@ -219,9 +220,9 @@ Candidates, roughly in order of usefulness:
   consumers, and a committed `uv.lock` so a checkout is reproducible. Mostly
   documentation, plus moving the `dev` extra into a `[dependency-groups]` table
   so `uv sync` picks it up without an `--extra`. Two routes do not follow:
-  `pre-commit` resolves `additional_dependencies` through pip, and
-  `uv add pylint-complex-struct` wants an index, so this reads better once
-  **Publish to PyPI** is done.
+  Both routes that used to block this are now open: `pre-commit` resolves
+  `additional_dependencies` through pip and `uv add pylint-complex-struct` has an
+  index to find, since the package is on PyPI.
 - **CI matrix on 3.10–3.13.** The PEP 695 tests already skip below 3.12; nothing
   else is version-sensitive, but it is untested off 3.12 today.
 - **A `--suggest` mode** printing a concrete alias for each finding
