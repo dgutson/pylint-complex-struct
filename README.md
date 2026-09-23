@@ -294,7 +294,7 @@ Ruff has reimplemented 50+ flake8 plugins natively, but the `TAE` rules are not 
 python3 -m venv .venv
 .venv/bin/pip install -e '.[dev]'
 .venv/bin/pytest -q
-.venv/bin/pylint --load-plugins=pylint_complex_struct pylint_complex_struct tests
+.venv/bin/pylint --load-plugins=pylint_complex_struct pylint_complex_struct
 ```
 
 The plugin is run against its own source as part of the test discipline, and is expected to

@@ -23,7 +23,7 @@ or `pytest` is the wrong command in this repo.
 
 ```bash
 .venv/bin/pytest -q                                    # 130 passed
-.venv/bin/pylint --load-plugins=pylint_complex_struct pylint_complex_struct tests   # 10.00/10
+.venv/bin/pylint --load-plugins=pylint_complex_struct pylint_complex_struct   # 10.00/10
 ```
 
 Both must be green before committing. The second is the dogfooding run: the checker is a

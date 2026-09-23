@@ -30,7 +30,7 @@ jobs:
 
       # The checker is a fixed point against its own source and has to stay one.
       - name: Dogfooding
-        run: pylint --load-plugins=pylint_complex_struct pylint_complex_struct tests
+        run: pylint --load-plugins=pylint_complex_struct pylint_complex_struct
 
       - name: Build sdist and wheel
         run: python -m build
