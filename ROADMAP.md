@@ -198,7 +198,7 @@ the `pyproject.toml` stanza above is usually all that is needed.
 
 Done and stable: the metric, the three messages, all nine options, 130 tests, and
 a self-clean run against its own source. Released to PyPI as `pylint-complex-struct`
-0.1.0, published from `.github/workflows/publish.yml` over Trusted Publishing — a
+0.2.0, published from `.github/workflows/publish.yml` over Trusted Publishing — a
 `v*` tag releases, a manual dispatch of the same workflow rehearses on TestPyPI.
 
 Candidates, roughly in order of usefulness:
