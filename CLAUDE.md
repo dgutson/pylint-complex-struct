@@ -10,7 +10,7 @@ aliases, `NamedTuple`s and `TypedDict`s. Three messages ship today:
 | ID | Symbol | Fires on |
 |---|---|---|
 | `R9501` | `complex-type-annotation` | an annotation over the depth or term budget |
-| `R9502` | `complex-type-alias` | the *body* of a type alias, over its laxer budget |
+| `R9502` | `complex-type-alias` | the *body* of a type alias, over `max-alias-complexity` |
 | `R9503` | `tuple-should-be-namedtuple` | a return annotation that is a heterogeneous fixed-size tuple |
 
 `README.md` has the metric, the rationale for every construct, and the comparison with
@@ -22,7 +22,7 @@ flake8 and ruff. `ROADMAP.md` has the invocation routes and what is planned next
 or `pytest` is the wrong command in this repo.
 
 ```bash
-.venv/bin/pytest -q                                    # 126 passed
+.venv/bin/pytest -q                                    # 130 passed
 .venv/bin/pylint --load-plugins=pylint_complex_struct pylint_complex_struct tests   # 10.00/10
 ```
 
@@ -81,6 +81,9 @@ happen to be installed, so CI and a laptop always agree.
   `depth.py` does not import pylint. Keep it that way.
 - A new scope option must be added to `VALID_SCOPES` (`checker.py:17`) and validated in
   `open()`, which raises on an unknown value rather than ignoring it.
+- **Option defaults are written only in `Policy`** (`depth.py`). The `options` table reads
+  them through `DEFAULTS = Policy()`; never put a literal `"default"` there.
+  `test_option_defaults_are_the_policy_defaults` fails if the two drift apart.
 - `pyproject.toml` sets `ignore-paths = ["tests/functional/.*"]`. That fixture is
   deliberately full of violations — do not "fix" it.
 

@@ -126,7 +126,7 @@ findings sets bit 3 (exit status `8`).
 | ID | Symbol | Fires on |
 |---|---|---|
 | `R9501` | `complex-type-annotation` | an annotation deeper than `max-annotation-complexity`, or with more terms than `max-annotation-terms` |
-| `R9502` | `complex-type-alias` | the *body* of a type alias, over the laxer `max-alias-complexity` |
+| `R9502` | `complex-type-alias` | the *body* of a type alias, over `max-alias-complexity` |
 | `R9503` | `tuple-should-be-namedtuple` | a return annotation that is a heterogeneous fixed-size tuple |
 
 At most one message is emitted per annotation site: the depth rule wins over the
@@ -162,7 +162,7 @@ on the command line (`--max-annotation-complexity=3`).
 | Option | Type | Default | Meaning |
 |---|---|---|---|
 | `max-annotation-complexity` | int | `2` | Max nesting depth of an annotation. |
-| `max-alias-complexity` | int | `3` | Max nesting depth of an alias body. |
+| `max-alias-complexity` | int | `2` | Max nesting depth of an alias body. |
 | `max-annotation-terms` | int | `7` | Max number of type terms in one annotation; `0` disables. |
 | `count-optional-as-nesting` | yn | `n` | Count `Optional[X]` / `X \| None` as a level. |
 | `count-union-as-nesting` | yn | `y` | Count a 2+ member union as a level. |
@@ -216,14 +216,22 @@ as a leaf and is silently ignored.
 
 ### Type aliases
 
-Alias bodies get their own, laxer budget, because absorbing structure is what an alias is
-for — but hiding one unreadable structure behind a name has only moved the problem:
+Alias bodies have their own budget, `max-alias-complexity`, which defaults to the same `2`
+as annotations. Hiding one unreadable structure behind a name has only moved the problem;
+composing aliases is what fixes it, because each alias is a single term wherever it is used:
 
 ```python
 type Row   = dict[str, Any]                       # fine
 type Table = list[Row]                            # composing is free
-type Blob  = dict[str, list[dict[str, Any]]]      # R9502: depth 4 > 3
+type Blob  = dict[str, list[dict[str, Any]]]      # R9502: depth 4 > 2
+
+type Findings = list[dict[str, str | None]]       # R9502: depth 3 > 2 (`| None` is free)
+type Finding  = dict[str, str | None]             # fixed: name the element...
+type Findings = list[Finding]                     # ...and the list is depth 2
 ```
+
+Set `max-alias-complexity = 3` to allow one more level inside alias bodies than in
+annotations (the default before 0.2.0).
 
 `type X = ...` (PEP 695) and `X: TypeAlias = ...` (PEP 613) are both recognised.
 Unannotated `Rows = dict[str, int]` is opt-in via `check-implicit-type-aliases`, because
@@ -260,7 +268,7 @@ covers the nesting metric today (`TAE002`/`TAE003`) with zero code. Its gaps:
 
 - no `ast.BinOp` case, so PEP 604 unions are invisible — `tuple[int, int] | None` scores
   **1** there and **2** here (pinned by `tests/test_depth.py::test_pep604_union_is_not_free`);
-- no concept of type aliases, so no laxer budget for alias bodies;
+- no concept of type aliases, so no separate budget for alias bodies;
 - no `NamedTuple` suggestion.
 
 **ruff** cannot do this at all: it does not support third-party plugins. The meta issue

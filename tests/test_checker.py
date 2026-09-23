@@ -12,6 +12,7 @@ from pylint.interfaces import HIGH
 from pylint.testutils import CheckerTestCase, MessageTest
 
 from pylint_complex_struct.checker import ComplexStructChecker
+from pylint_complex_struct.depth import Policy
 
 PHASES = "tuple[dict[str, tuple[int, int] | None], dict[int, str]]"
 RECORDS = "tuple[list[dict[str, Any]], dict[str, Any]]"
@@ -156,9 +157,43 @@ class TestComplexStructChecker(CheckerTestCase):  # pylint: disable=too-many-pub
     # -- aliases --------------------------------------------------------------
 
     @needs_pep695
-    def test_alias_gets_the_laxer_budget(self) -> None:
+    def test_alias_within_budget_is_silent(self) -> None:
         with self.assertNoMessages():
-            self.walk(module("type Rows = list[dict[str, Any]]"))
+            self.walk(module("type Rows = dict[str, Any]"))
+
+    @needs_pep695
+    def test_alias_nesting_containers_is_flagged(self) -> None:
+        """The reported miss: `| None` is transparent, so this is depth 3."""
+        node = module("type Findings = list[dict[str, str | None]]")
+        alias = node.body[0]
+        with self.assertAddsMessages(
+            MessageTest(
+                msg_id="complex-type-alias",
+                node=alias.value,
+                args=("'Findings'", "nesting depth 3 > 2"),
+                confidence=HIGH,
+            ),
+            ignore_position=True,
+        ):
+            self.walk(node)
+
+    @needs_pep695
+    def test_composed_alias_is_silent(self) -> None:
+        """The fix the message asks for must actually clear it."""
+        node = module(
+            """
+            type Finding = dict[str, str | None]
+            type Findings = list[Finding]
+            """
+        )
+        with self.assertNoMessages():
+            self.walk(node)
+
+    @needs_pep695
+    def test_alias_budget_is_configurable(self) -> None:
+        self.linter.config.max_alias_complexity = 3
+        with self.assertNoMessages():
+            self.walk(module("type Findings = list[dict[str, str | None]]"))
 
     @needs_pep695
     def test_alias_over_its_own_budget(self) -> None:
@@ -168,7 +203,7 @@ class TestComplexStructChecker(CheckerTestCase):  # pylint: disable=too-many-pub
             MessageTest(
                 msg_id="complex-type-alias",
                 node=alias.value,
-                args=("'Rows'", "nesting depth 4 > 3"),
+                args=("'Rows'", "nesting depth 4 > 2"),
                 confidence=HIGH,
             ),
             ignore_position=True,
@@ -176,6 +211,9 @@ class TestComplexStructChecker(CheckerTestCase):  # pylint: disable=too-many-pub
             self.walk(node)
 
     def test_pep613_alias_marker_is_not_scored(self) -> None:
+        # Depth 3: over the annotation budget, within this alias budget. Silence proves
+        # the body is measured as an alias, not as an annotation.
+        self.linter.config.max_alias_complexity = 3
         with self.assertNoMessages():
             self.walk(
                 module("from typing import TypeAlias\nRows: TypeAlias = list[dict[str, Any]]")
@@ -340,6 +378,11 @@ class TestComplexStructChecker(CheckerTestCase):  # pylint: disable=too-many-pub
         assert [m.msg_id for m in self._collect(node)] == ["complex-type-annotation"]
 
     # -- options --------------------------------------------------------------
+
+    def test_option_defaults_are_the_policy_defaults(self) -> None:
+        """`Policy` is the single source of defaults; the option table must not drift."""
+        # pylint: disable-next=protected-access  # the option -> field mapping under test
+        assert self.checker._build_policy() == Policy()
 
     def test_budget_of_three_matches_the_flake8_default(self) -> None:
         self.linter.config.max_annotation_complexity = 3

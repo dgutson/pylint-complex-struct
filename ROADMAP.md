@@ -12,7 +12,7 @@ Three messages:
 | ID | Symbol | Fires on |
 |---|---|---|
 | `R9501` | `complex-type-annotation` | an annotation over the depth or term budget |
-| `R9502` | `complex-type-alias` | the *body* of a type alias, over its laxer budget |
+| `R9502` | `complex-type-alias` | the *body* of a type alias, over `max-alias-complexity` |
 | `R9503` | `tuple-should-be-namedtuple` | a return annotation that is a heterogeneous fixed-size tuple |
 
 Depth counts subscript levels and **a name is always a leaf**: `int` is 1,
@@ -65,7 +65,7 @@ load-plugins = ["pylint_complex_struct"]
 
 [tool.pylint."complex-struct"]
 max-annotation-complexity = 2
-max-alias-complexity = 3
+max-alias-complexity = 2
 namedtuple-check-scope = ["returns"]
 ```
 
@@ -82,7 +82,7 @@ load-plugins=pylint_complex_struct
 
 [complex-struct]
 max-annotation-complexity=2
-max-alias-complexity=3
+max-alias-complexity=2
 namedtuple-check-scope=returns
 ```
 
@@ -169,7 +169,7 @@ the `pyproject.toml` stanza above is usually all that is needed.
 | Option | Type | Default |
 |---|---|---|
 | `max-annotation-complexity` | int | `2` |
-| `max-alias-complexity` | int | `3` |
+| `max-alias-complexity` | int | `2` |
 | `max-annotation-terms` | int | `7` |
 | `count-optional-as-nesting` | yn | `n` |
 | `count-union-as-nesting` | yn | `y` |
@@ -196,7 +196,7 @@ the `pyproject.toml` stanza above is usually all that is needed.
 
 ## Where it is going
 
-Done and stable: the metric, the three messages, all nine options, 126 tests, and
+Done and stable: the metric, the three messages, all nine options, 130 tests, and
 a self-clean run against its own source. Released to PyPI as `pylint-complex-struct`
 0.1.0, published from `.github/workflows/publish.yml` over Trusted Publishing — a
 `v*` tag releases, a manual dispatch of the same workflow rehearses on TestPyPI.

@@ -12,7 +12,7 @@ from .checker import ComplexStructChecker
 if TYPE_CHECKING:
     from pylint.lint import PyLinter
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = ["ComplexStructChecker", "register"]
 
 

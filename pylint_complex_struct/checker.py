@@ -15,6 +15,8 @@ if TYPE_CHECKING:
     from pylint.lint import PyLinter
 
 VALID_SCOPES = frozenset({"returns", "params", "attributes", "locals", "aliases"})
+#: The single source of every option default below.
+DEFAULTS = Policy()
 
 
 class MessageKey(NamedTuple):
@@ -57,7 +59,7 @@ class ComplexStructChecker(BaseChecker):
         "R9502": (
             "Type alias %s is too complex (%s); compose it from smaller aliases",
             "complex-type-alias",
-            "Emitted when the body of a type alias exceeds the (laxer) alias budget. "
+            "Emitted when the body of a type alias exceeds the alias budget. "
             "Composing aliases is encouraged; hiding one unreadable structure behind a "
             "single name is not.",
         ),
@@ -74,7 +76,7 @@ class ComplexStructChecker(BaseChecker):
         (
             "max-annotation-complexity",
             {
-                "default": 2,
+                "default": DEFAULTS.max_annotation_complexity,
                 "type": "int",
                 "metavar": "<int>",
                 "help": "Maximum nesting depth of a type annotation. 'int' is 1, "
@@ -85,19 +87,19 @@ class ComplexStructChecker(BaseChecker):
         (
             "max-alias-complexity",
             {
-                "default": 3,
+                "default": DEFAULTS.max_alias_complexity,
                 "type": "int",
                 "metavar": "<int>",
                 "help": "Maximum nesting depth allowed in the body of a type alias "
-                "('type X = ...', 'X: TypeAlias = ...'). Laxer than "
-                "max-annotation-complexity, because absorbing structure is what an "
-                "alias is for.",
+                "('type X = ...', 'X: TypeAlias = ...'). A deep body is composed from "
+                "smaller aliases, each of which is a single term; set 3 to allow one "
+                "more level of nesting inside an alias.",
             },
         ),
         (
             "max-annotation-terms",
             {
-                "default": 7,
+                "default": DEFAULTS.max_annotation_terms,
                 "type": "int",
                 "metavar": "<int>",
                 "help": "Maximum number of type terms (leaves) in one annotation; a "
@@ -107,7 +109,7 @@ class ComplexStructChecker(BaseChecker):
         (
             "count-optional-as-nesting",
             {
-                "default": False,
+                "default": DEFAULTS.count_optional,
                 "type": "yn",
                 "metavar": "<y or n>",
                 "help": "Count 'Optional[X]' and 'X | None' as a level of nesting.",
@@ -116,7 +118,7 @@ class ComplexStructChecker(BaseChecker):
         (
             "count-union-as-nesting",
             {
-                "default": True,
+                "default": DEFAULTS.count_union,
                 "type": "yn",
                 "metavar": "<y or n>",
                 "help": "Count a union of two or more non-None members as a level of "
@@ -126,7 +128,7 @@ class ComplexStructChecker(BaseChecker):
         (
             "count-callable-params-as-nesting",
             {
-                "default": False,
+                "default": DEFAULTS.count_callable_params,
                 "type": "yn",
                 "metavar": "<y or n>",
                 "help": "Count the parameter-list bracket of 'Callable[[A, B], R]' as a "
@@ -136,7 +138,7 @@ class ComplexStructChecker(BaseChecker):
         (
             "namedtuple-check-scope",
             {
-                "default": ("returns",),
+                "default": tuple(sorted(DEFAULTS.namedtuple_scopes)),
                 "type": "csv",
                 "metavar": "<scopes>",
                 "help": "Where to suggest a NamedTuple for heterogeneous fixed-size "
@@ -147,7 +149,7 @@ class ComplexStructChecker(BaseChecker):
         (
             "min-namedtuple-fields",
             {
-                "default": 2,
+                "default": DEFAULTS.min_namedtuple_fields,
                 "type": "int",
                 "metavar": "<int>",
                 "help": "Minimum number of elements a heterogeneous tuple must have "
@@ -157,7 +159,7 @@ class ComplexStructChecker(BaseChecker):
         (
             "check-implicit-type-aliases",
             {
-                "default": False,
+                "default": DEFAULTS.check_implicit_type_aliases,
                 "type": "yn",
                 "metavar": "<y or n>",
                 "help": "Also treat unannotated module- or class-level assignments whose "

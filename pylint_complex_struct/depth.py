@@ -58,10 +58,14 @@ _PARSEABLE = (
 
 @dataclass(frozen=True)
 class Policy:  # pylint: disable=too-many-instance-attributes  # a bundle of options
-    """Resolved option values, built once per module."""
+    """Resolved option values, built once per module.
+
+    The field defaults are the options' defaults: the checker's option table reads
+    them from here, so this is the only place a default is written.
+    """
 
     max_annotation_complexity: int = 2
-    max_alias_complexity: int = 3
+    max_alias_complexity: int = 2
     max_annotation_terms: int = 7
     count_optional: bool = False
     count_union: bool = True
